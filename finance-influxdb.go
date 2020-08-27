@@ -22,6 +22,7 @@ func main() {
 	influxEndpoint := os.Getenv("INFLUX_ENDPOINT")
 	if influxEndpoint == "" {
 		influxEndpoint = "http://127.0.0.1:8086"
+		log.Printf("No INFLUX_ENDPOINT env variable found, using %s.\n", influxEndpoint)
 	}
 
 	host, err := url.Parse(influxEndpoint)
@@ -50,6 +51,7 @@ func main() {
 	ci, _ := strconv.ParseUint(os.Getenv("COLLECTION_INTERVAL"), 10, 32)
 	if ci == 0 {
 		ci = 60
+		log.Printf("No COLLECTION_INTERVAL env variable found, using %d.", ci)
 	}
 	collectionInterval := time.Duration(ci) * time.Second
 
@@ -58,11 +60,10 @@ func main() {
 		panic("Please set the environment variable SYMBOLS to your preferred stock ticker names, comma seperated. Ie SYMBOLS=AAPL,TSLA")
 	}
 
-	data := make([]client.Point, len(symbols))
-
 	// Collection loop
 	for {
 		iter := equity.List(symbols)
+		data := make([]client.Point, len(symbols))
 
 		// Iterate over results. Will exit upon any error.
 		for iter.Next() {

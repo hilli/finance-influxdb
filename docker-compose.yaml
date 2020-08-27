@@ -1,0 +1,25 @@
+version: '3.7'
+services:
+  finance-statsd:
+    image: hilli/finance-influxdb
+    container_name: finance-influxdb
+    hostname: finance-influxdb
+    restart: unless-stopped
+    depends_on:
+      - influxdb
+    environment:
+      STATSD_ENDPOINT: "http://influxdb:8086"
+      COLLECTION_INTERVAL: 60
+      SYMBOLS: "AAPL,TSLA,MSFT"
+      #INFLUX_USER: myuser
+      #INFLUX_PASSWORD: "boohoo:
+      DEBUG: "true"
+
+  influxdb:
+    image: influxdb:alpine
+    container_name: influxdb
+    hostname: influxdb
+    ports:
+      - "8086:8086"
+    environment:
+      INFLUXDB_DB: finance
